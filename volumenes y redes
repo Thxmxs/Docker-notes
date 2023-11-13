@@ -1,0 +1,56 @@
+##El contenedor puede hacer persistente su data almacenandola en volúmenes 
+
+#Crear volumen (persistir informacion de la db)
+ Docker volume create world-db
+
+#Crear una red para comunicarnos entre contenedores
+docker network create <nombre contenedor>
+
+#crear contenedor de mariadb asignándole un volumen para resistir la data y la red en comun
+docker container run \
+-p 3306:3306 -d \
+--name world-db \
+--env MARIADB_ROOT_PASSWORD=user_password \
+--env MARIADB_database=world_db \
+--volume world-db:/var/lib/mysql \
+--network world-app \
+mariadb:jammy
+
+#con 8080:80 estamos redirigiendo el tráfico desde el puerto 8080 de nuestra pc al puerto 80 del contenedor que es donde esta escuchando 
+docker container run \
+--name phpmyadmin \
+-d \
+-e PMA_ARBITRARY=1 \
+-p 8080:80 \
+--network world-app \
+phpmyadmin:5.2.0-apache
+
+#unimos los contenedores a la red
+docker network connect world-app <id contenedor>
+
+#ver redes añadidas a la network
+docker network inspect world-app
+
+#Para conectarnos desde phpmyadmin
+url localhost:8080
+servidor: ip asignada al contenedor en la red
+usuario: usuario de mariadb
+pass: pass de maria_db
+
+
+##BIND VOLUMES
+#Es una manera de asociar una carpeta (App) de nuestro equipo real y mapearla como una carpeta dentro de un contenedor
+
+#con -w especificamos el working directory
+#con sh -c ejecutamos un comando luego que se monta la imagen para instalar las dependencias e iniciar la app
+#-v "$(pwd)":/app : aqui especificamos que se copie lo del directorio actual al directorio app del contenedor
+docker container run \
+--name nest-app \
+-w /app \
+-p 80:3000 \
+-v "$(pwd)":/app \
+node:18-alpine3.17 \
+sh -c "yarn install && yarn start:dev"
+
+#terminal interactiva
+ocker exec -it <id container> /bin/sh
