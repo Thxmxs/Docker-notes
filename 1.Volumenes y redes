@@ -4,7 +4,7 @@
  Docker volume create world-db
 
 #Crear una red para comunicarnos entre contenedores
-docker network create <nombre contenedor>
+docker network create <nombre red>
 
 #crear contenedor de mariadb asignándole un volumen para resistir la data y la red en comun
 docker container run \
@@ -54,3 +54,34 @@ sh -c "yarn install && yarn start:dev"
 
 #terminal interactiva
 ocker exec -it <id container> /bin/sh
+
+#######################################
+
+##PRACTICA
+#volumen
+docker volume create postgres-db
+
+#container postgres
+docker container run \
+-d \
+--name postgres-db \
+-e POSTGRES_PASSWORD=123456 \
+-v postgres-db:/var/lib/postgresql/data \
+postgres:15.1
+
+#container pgAdmin
+docker container run \
+--name pgAdmin \
+-e PGADMIN_DEFAULT_PASSWORD=123456 \
+-e PGADMIN_DEFAULT_EMAIL=superman@google.com \
+-dp 8080:80 \
+dpage/pgadmin4:6.17
+
+#crear network
+docker network create postgres-net
+
+#añadir contenedores a la red
+docker network connect postgres-net <id-contenedor>
+
+#verificamos los contenedores añadidos
+docker network inspect <nombre-network>

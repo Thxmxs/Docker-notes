@@ -1,0 +1,10 @@
+##Multi-container 
+
+#para levantar docker compose (debemos estar al mismo nivel de directorio)
+docker compose up -d
+
+si dejamos el volumen con solo : al final nos creara un nuevo volumen
+si agregamos external: true utilizara un volumen que ya este creado
+
+#eliminar docker compose
+docker compose down
